@@ -6,6 +6,7 @@ export function BusinessDetailDialog(props: {
   match?: BusinessMatch;
   onClose: () => void;
   onSelect: () => void;
+  selectLoading?: boolean;
 }) {
   const match = props.match;
 
@@ -36,8 +37,8 @@ export function BusinessDetailDialog(props: {
         <Button onClick={props.onClose} color="inherit">
           Close
         </Button>
-        <Button variant="contained" onClick={props.onSelect} disabled={!match}>
-          Select this business
+        <Button variant="contained" onClick={props.onSelect} disabled={!match || props.selectLoading}>
+          {props.selectLoading ? 'Selecting...' : 'Select this business'}
         </Button>
       </DialogActions>
     </Dialog>

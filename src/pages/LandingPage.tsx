@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActionArea, CardContent, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardActionArea, CardContent, CircularProgress, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlanning } from '../context/PlanningContext';
@@ -19,6 +19,7 @@ export function LandingPage() {
   const [guestCount, setGuestCount] = useState<number>(25);
   const [budget, setBudget] = useState<number>(3000);
   const [eventDate, setEventDate] = useState<string>(addDays(45));
+  const [loading, setLoading] = useState(false);
 
   const selectedEventType = useMemo(
     () => eventTypes.find((t) => t.id === eventTypeId),
@@ -26,17 +27,22 @@ export function LandingPage() {
   );
 
   async function onStartPlanning() {
-    const userId = 1; // mock
-    const eventId = await createDraftEvent({
-      eventTypeId,
-      title: title.trim() || 'My Event',
-      location,
-      guestCount,
-      budget,
-      eventDate,
-      userId,
-    });
-    navigate(`/events/${eventId}/setup`);
+    setLoading(true);
+    try {
+      const userId = 1; // mock
+      const eventId = await createDraftEvent({
+        eventTypeId,
+        title: title.trim() || 'My Event',
+        location,
+        guestCount,
+        budget,
+        eventDate,
+        userId,
+      });
+      navigate(`/events/${eventId}/setup`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -151,12 +157,13 @@ export function LandingPage() {
                 variant="contained"
                 size="large"
                 onClick={onStartPlanning}
+                disabled={loading}
                 sx={{
                   backgroundImage: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
                   '&:hover': { backgroundImage: 'linear-gradient(135deg, #6d28d9, #0891b2)' },
                 }}
               >
-                Start Planning
+                {loading ? <CircularProgress size={20} color="inherit" /> : 'Start Planning'}
               </Button>
             </Stack>
           </Paper>

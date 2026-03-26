@@ -6,6 +6,7 @@ export function BusinessCard(props: {
   reasoning?: string;
   onSelect: () => void;
   onViewDetails?: () => void;
+  selectLoading?: boolean;
 }) {
   const { match } = props;
 
@@ -56,7 +57,7 @@ export function BusinessCard(props: {
 
       <CardActions>
         <Chip
-          label="Select"
+          label={props.selectLoading ? 'Selecting...' : 'Select'}
           component="button"
           onClick={props.onSelect}
           clickable
@@ -64,6 +65,7 @@ export function BusinessCard(props: {
             cursor: 'pointer',
             fontWeight: 800,
           }}
+          disabled={props.selectLoading}
         />
         {props.onViewDetails ? (
           <Chip
@@ -75,6 +77,7 @@ export function BusinessCard(props: {
               cursor: 'pointer',
               fontWeight: 800,
             }}
+            disabled={props.selectLoading}
           />
         ) : null}
       </CardActions>

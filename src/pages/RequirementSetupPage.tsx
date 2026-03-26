@@ -1,4 +1,4 @@
-import { Box, Button, Container, FormControl, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, CircularProgress, FormControl, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePlanning } from '../context/PlanningContext';
@@ -16,6 +16,7 @@ export function RequirementSetupPage() {
   const [mode, setMode] = useState<'hire' | 'diy'>('hire');
   const [theme, setTheme] = useState<string>('');
   const [preference, setPreference] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   const existingShortlist = requirementId ? shortlistedMatchByRequirementId[requirementId] : undefined;
 
@@ -52,6 +53,7 @@ export function RequirementSetupPage() {
   }
 
   async function onSeeMatches() {
+    setLoading(true);
     setRequirementBudgetOverride(requirement.id, budgetOverride === '' ? undefined : Number(budgetOverride));
     setRequirementDiyOrHire(requirement.id, mode);
 
@@ -61,8 +63,12 @@ export function RequirementSetupPage() {
     ].filter((x) => x.value.length > 0);
 
     upsertRequirementMetadata(requirement.id, metadata);
-    await generateMatchesForRequirement(requirement.id);
-    navigate(`/requirements/${requirement.id}/matches`);
+    try {
+      await generateMatchesForRequirement(requirement.id);
+      navigate(`/requirements/${requirement.id}/matches`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -118,8 +124,8 @@ export function RequirementSetupPage() {
                 fullWidth
               />
 
-              <Button variant="contained" size="large" onClick={onSeeMatches}>
-                See Matching Options
+              <Button variant="contained" size="large" onClick={onSeeMatches} disabled={loading}>
+                {loading ? <CircularProgress size={20} color="inherit" /> : 'See Matching Options'}
               </Button>
             </Stack>
           </Paper>
