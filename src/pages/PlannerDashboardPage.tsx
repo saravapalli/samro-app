@@ -43,15 +43,6 @@ export function PlannerDashboardPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={3}>
-          <EventSidebar
-            event={event}
-            requirements={requirements}
-            shortlistedMatchByRequirementId={shortlistedMatchByRequirementId}
-            onPlanRequirement={(requirementId) => navigate(`/events/${event.id}/requirements/${requirementId}`)}
-          />
-        </Grid>
-
         <Grid item xs={12} md={9}>
           <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -94,6 +85,15 @@ export function PlannerDashboardPage() {
               Contact vendors
             </Button>
           </Stack>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <EventSidebar
+            event={event}
+            requirements={requirements}
+            shortlistedMatchByRequirementId={shortlistedMatchByRequirementId}
+            onPlanRequirement={(requirementId) => navigate(`/events/${event.id}/requirements/${requirementId}`)}
+          />
         </Grid>
       </Grid>
     </Container>

@@ -1,4 +1,4 @@
-import { Box, Button, Container, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePlanning } from '../context/PlanningContext';
@@ -20,6 +20,7 @@ export function ContactVendorsPage() {
   }, [requirements, shortlistedMatchByRequirementId]);
 
   const [messages, setMessages] = useState<Record<number, string>>({});
+  const [contacting, setContacting] = useState(false);
 
   useEffect(() => {
     const next: Record<number, string> = {};
@@ -46,12 +47,17 @@ export function ContactVendorsPage() {
   }
 
   async function onContactNow() {
-    await contactShortlisted(
-      selected.map((s) => ({
-        requirementId: s.requirement.id,
-        message: messages[s.requirement.id] ?? '',
-      })),
-    );
+    setContacting(true);
+    try {
+      await contactShortlisted(
+        selected.map((s) => ({
+          requirementId: s.requirement.id,
+          message: messages[s.requirement.id] ?? '',
+        })),
+      );
+    } finally {
+      setContacting(false);
+    }
   }
 
   return (
@@ -132,8 +138,8 @@ export function ContactVendorsPage() {
         </Stack>
 
         <Stack direction="row" spacing={2}>
-          <Button variant="contained" onClick={onContactNow} disabled={selected.length === 0}>
-            Contact now
+          <Button variant="contained" onClick={onContactNow} disabled={selected.length === 0 || contacting}>
+            {contacting ? <CircularProgress size={20} color="inherit" /> : 'Contact now'}
           </Button>
           <Button variant="outlined" onClick={() => navigate(`/events/${event.id}/planner`)}>
             Save and come back later

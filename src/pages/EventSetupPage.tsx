@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePlanning } from '../context/PlanningContext';
@@ -19,6 +19,7 @@ export function EventSetupPage() {
   const [localBudget, setLocalBudget] = useState<number>(0);
   const [localGuests, setLocalGuests] = useState<number>(0);
   const [localLocation, setLocalLocation] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   const eventTypeName = useMemo(() => {
     if (!event) return '';
@@ -50,6 +51,7 @@ export function EventSetupPage() {
   }
 
   async function onGeneratePlan() {
+    setLoading(true);
     updateEventSetup({
       title: localTitle,
       eventDate: localDate,
@@ -57,8 +59,12 @@ export function EventSetupPage() {
       guestCount: localGuests,
       location: localLocation,
     });
-    await autoGenerateRequirements();
-    navigate(`/events/${event.id}/planner`);
+    try {
+      await autoGenerateRequirements();
+      navigate(`/events/${event!.id}/planner`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -110,8 +116,8 @@ export function EventSetupPage() {
                   />
                 </Stack>
 
-                <Button variant="contained" size="large" onClick={onGeneratePlan}>
-                  Generate My Plan
+                <Button variant="contained" size="large" onClick={onGeneratePlan} disabled={loading}>
+                  {loading ? <CircularProgress size={20} color="inherit" /> : 'Generate My Plan'}
                 </Button>
               </Stack>
             </Paper>

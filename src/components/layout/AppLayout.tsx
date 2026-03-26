@@ -14,6 +14,7 @@ function getSelectedKey(pathname: string) {
   if (pathname === '/' || pathname === '') return 'landing';
   if (pathname.includes('/setup')) return 'setup';
   if (pathname.includes('/planner')) return 'planner';
+  if (pathname.includes('/requirements/')) return 'planner';
   if (pathname.includes('/review')) return 'review';
   if (pathname.includes('/contact')) return 'contact';
   return 'landing';

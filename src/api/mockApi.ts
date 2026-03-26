@@ -15,6 +15,9 @@ let nextId = 100;
 export const EVENT_TYPES: EventTypeOption[] = [
   { id: 1, name: 'birthday', description: 'Birthday celebration' },
   { id: 2, name: 'wedding', description: 'Wedding celebration' },
+  { id: 3, name: 'baby_shower', description: 'Baby shower celebration' },
+  { id: 4, name: 'corporate', description: 'Corporate event' },
+  { id: 5, name: 'graduation', description: 'Graduation celebration' },
 ];
 
 export function mockCreateDraftEvent(input: {
@@ -50,20 +53,55 @@ export function mockAutoGenerateRequirements(input: {
   // MVP scope: keep it small and curated.
   const budget = input.budget ?? 0;
 
-  const base = input.eventTypeId === 1
-    ? [
-        { businessTypeId: 2, title: 'Cake', required: true, priorityWeight: 5 },
-        { businessTypeId: 3, title: 'Decoration', required: true, priorityWeight: 4 },
-        { businessTypeId: 4, title: 'Venue', required: false, priorityWeight: 3 },
-        { businessTypeId: 5, title: 'Photography', required: false, priorityWeight: 2 },
-        { businessTypeId: 6, title: 'Entertainment', required: false, priorityWeight: 1 },
-      ]
-    : [
-        { businessTypeId: 7, title: 'Catering', required: true, priorityWeight: 5 },
-        { businessTypeId: 8, title: 'Venue', required: true, priorityWeight: 4 },
-        { businessTypeId: 9, title: 'Photography', required: false, priorityWeight: 3 },
-        { businessTypeId: 10, title: 'Decoration', required: false, priorityWeight: 2 },
-      ];
+  const base = (() => {
+    switch (input.eventTypeId) {
+      case 1: // birthday
+        return [
+          { businessTypeId: 2, title: 'Cake', required: true, priorityWeight: 5 },
+          { businessTypeId: 3, title: 'Decoration', required: true, priorityWeight: 4 },
+          { businessTypeId: 4, title: 'Venue', required: false, priorityWeight: 3 },
+          { businessTypeId: 5, title: 'Photography', required: false, priorityWeight: 2 },
+          { businessTypeId: 6, title: 'Entertainment', required: false, priorityWeight: 1 },
+        ];
+      case 2: // wedding
+        return [
+          { businessTypeId: 7, title: 'Catering', required: true, priorityWeight: 5 },
+          { businessTypeId: 8, title: 'Venue', required: true, priorityWeight: 4 },
+          { businessTypeId: 9, title: 'Decoration', required: false, priorityWeight: 3 },
+          { businessTypeId: 10, title: 'Photography', required: false, priorityWeight: 3 },
+          { businessTypeId: 11, title: 'Entertainment', required: false, priorityWeight: 2 },
+        ];
+      case 3: // baby shower
+        return [
+          { businessTypeId: 12, title: 'Cake / Treats', required: true, priorityWeight: 5 },
+          { businessTypeId: 13, title: 'Decoration', required: true, priorityWeight: 4 },
+          { businessTypeId: 14, title: 'Venue', required: false, priorityWeight: 3 },
+          { businessTypeId: 15, title: 'Photography', required: false, priorityWeight: 2 },
+        ];
+      case 4: // corporate
+        return [
+          { businessTypeId: 16, title: 'Venue', required: true, priorityWeight: 5 },
+          { businessTypeId: 17, title: 'Catering', required: true, priorityWeight: 4 },
+          { businessTypeId: 18, title: 'AV / Rentals', required: false, priorityWeight: 3 },
+          { businessTypeId: 19, title: 'Entertainment', required: false, priorityWeight: 2 },
+          { businessTypeId: 20, title: 'Branding / Decor', required: false, priorityWeight: 1 },
+        ];
+      case 5: // graduation
+        return [
+          { businessTypeId: 21, title: 'Celebration Cake', required: true, priorityWeight: 5 },
+          { businessTypeId: 22, title: 'Decoration', required: true, priorityWeight: 4 },
+          { businessTypeId: 23, title: 'Venue', required: false, priorityWeight: 3 },
+          { businessTypeId: 24, title: 'Photography', required: false, priorityWeight: 2 },
+          { businessTypeId: 25, title: 'Activities / Props', required: false, priorityWeight: 1 },
+        ];
+      default:
+        return [
+          { businessTypeId: 2, title: 'Cake', required: true, priorityWeight: 5 },
+          { businessTypeId: 3, title: 'Decoration', required: true, priorityWeight: 4 },
+          { businessTypeId: 4, title: 'Venue', required: false, priorityWeight: 3 },
+        ];
+    }
+  })();
 
   const totalWeight = base.reduce((sum, x) => sum + x.priorityWeight, 0) || 1;
 

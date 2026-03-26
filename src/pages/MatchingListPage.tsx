@@ -1,4 +1,5 @@
 import { Box, Button, Card, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BusinessDetailDialog } from '../components/business/BusinessDetailDialog';
@@ -20,6 +21,8 @@ export function MatchingListPage() {
   const [maxPrice, setMaxPrice] = useState<number>(200000);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailMatchId, setDetailMatchId] = useState<number | null>(null);
+  const [selectingMatchId, setSelectingMatchId] = useState<number | null>(null);
+  const [applyingFilters, setApplyingFilters] = useState(false);
 
   const filtered = useMemo(() => {
     return matches
@@ -50,8 +53,13 @@ export function MatchingListPage() {
   }
 
   async function onSelectMatch(matchId: number) {
-    await shortlistMatch(matchId);
-    navigate(`/events/${event.id}/planner`);
+    setSelectingMatchId(matchId);
+    try {
+      await shortlistMatch(matchId);
+      if (event) navigate(`/events/${event.id}/planner`);
+    } finally {
+      setSelectingMatchId(null);
+    }
   }
 
   return (
@@ -106,10 +114,12 @@ export function MatchingListPage() {
                 variant="contained"
                 fullWidth
                 onClick={() => {
-                  // No-op: filters are local in this mock.
+                  setApplyingFilters(true);
+                  window.setTimeout(() => setApplyingFilters(false), 350);
                 }}
+                disabled={applyingFilters}
               >
-                Apply filters
+                {applyingFilters ? <CircularProgress size={20} color="inherit" /> : 'Apply filters'}
               </Button>
             </Grid>
           </Grid>
@@ -130,6 +140,7 @@ export function MatchingListPage() {
                 match={m}
                 reasoning={m.reasoning}
                 onSelect={() => onSelectMatch(m.id)}
+                selectLoading={selectingMatchId === m.id}
                 onViewDetails={() => {
                   setDetailMatchId(m.id);
                   setDetailOpen(true);
@@ -148,6 +159,7 @@ export function MatchingListPage() {
             setDetailOpen(false);
             onSelectMatch(detailMatch.id);
           }}
+          selectLoading={selectingMatchId === detailMatch?.id}
         />
       </Stack>
     </Container>
