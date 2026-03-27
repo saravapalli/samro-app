@@ -12,12 +12,43 @@ import type {
 
 let nextId = 100;
 
+/** Unsplash (royalty-free). Replace with self-hosted assets in production if preferred. */
 export const EVENT_TYPES: EventTypeOption[] = [
-  { id: 1, name: 'birthday', description: 'Birthday celebration' },
-  { id: 2, name: 'wedding', description: 'Wedding celebration' },
-  { id: 3, name: 'baby_shower', description: 'Baby shower celebration' },
-  { id: 4, name: 'corporate', description: 'Corporate event' },
-  { id: 5, name: 'graduation', description: 'Graduation celebration' },
+  {
+    id: 1,
+    name: 'birthday',
+    description: 'Birthday celebration',
+    imageUrl:
+      'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 2,
+    name: 'wedding',
+    description: 'Wedding celebration',
+    imageUrl:
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 3,
+    name: 'baby_shower',
+    description: 'Baby shower celebration',
+    imageUrl:
+      'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 4,
+    name: 'corporate',
+    description: 'Corporate event',
+    imageUrl:
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 5,
+    name: 'graduation',
+    description: 'Graduation celebration',
+    imageUrl:
+      'https://images.unsplash.com/photo-1525921429624-679b75626ba4?auto=format&fit=crop&w=800&q=80',
+  },
 ];
 
 export function mockCreateDraftEvent(input: {

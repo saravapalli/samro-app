@@ -11,7 +11,7 @@ import {
 } from '../api/mockApi';
 import type { ServerEventContext } from '../api/suggestionEngine';
 
-export type EventTypeOption = { id: number; name: string; description?: string };
+export type EventTypeOption = { id: number; name: string; description?: string; imageUrl?: string };
 
 export type EventDraft = {
   id: number;

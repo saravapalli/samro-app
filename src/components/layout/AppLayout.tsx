@@ -1,4 +1,4 @@
-import { Box, Chip, CssBaseline, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
+import { Box, Chip, CssBaseline, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
@@ -95,12 +95,7 @@ export function AppLayout() {
           <Box sx={{ flexGrow: 1 }} />
 
           {event ? (
-            <Chip
-              label={`Planning: ${event.title}`}
-              variant="outlined"
-              color="secondary"
-              sx={{ maxWidth: 420 }}
-            />
+            <Chip label="Planning" color="secondary" variant="outlined" size="small" />
           ) : (
             <Chip label="Start a new plan" variant="outlined" color="primary" />
           )}
@@ -144,6 +139,11 @@ export function AppLayout() {
 
         <Box component="main" sx={{ flexGrow: 1, p: 3, minWidth: 0 }}>
           <Toolbar />
+          {event ? (
+            <Typography variant="h5" component="h1" sx={{ fontWeight: 800, mb: 2 }} noWrap title={event.title}>
+              {event.title}
+            </Typography>
+          ) : null}
           <SuggestionPanel />
           <Outlet />
         </Box>

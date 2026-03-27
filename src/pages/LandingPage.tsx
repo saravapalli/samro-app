@@ -1,4 +1,18 @@
-import { Box, Button, Card, CardActionArea, CardContent, CircularProgress, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  CircularProgress,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlanning } from '../context/PlanningContext';
@@ -8,6 +22,9 @@ function addDays(days: number) {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+const HERO_IMAGE =
+  'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -57,12 +74,49 @@ export function LandingPage() {
       <Grid container spacing={3}>
         <Grid item xs={12} md={7}>
           <Stack spacing={2}>
-            <Typography variant="h3" sx={{ fontWeight: 800 }}>
-              Plan your event, step by step
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              An AI-powered event planning assistant that helps you discover the right vendors and stay within budget — all in one place.
-            </Typography>
+            <Box
+              sx={{
+                position: 'relative',
+                borderRadius: 3,
+                overflow: 'hidden',
+                minHeight: { xs: 200, sm: 260 },
+                backgroundColor: 'action.hover',
+              }}
+            >
+              <Box
+                component="img"
+                src={HERO_IMAGE}
+                alt="Guests celebrating at an event with string lights"
+                sx={{
+                  width: '100%',
+                  height: { xs: 200, sm: 260 },
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(90deg, rgba(15,23,42,0.82) 0%, rgba(15,23,42,0.45) 55%, transparent 100%)',
+                }}
+              />
+              <Box sx={{ position: 'absolute', left: 24, bottom: 20, right: 24, maxWidth: 520 }}>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: 800, color: 'common.white', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
+                >
+                  Plan your event, step by step
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ color: 'rgba(255,255,255,0.92)', mt: 1, textShadow: '0 1px 8px rgba(0,0,0,0.35)' }}
+                >
+                  Discover vendors, compare options, and stay on budget—with guidance along the way.
+                </Typography>
+              </Box>
+            </Box>
 
             <Paper
               sx={{
@@ -86,11 +140,23 @@ export function LandingPage() {
                         borderColor: eventTypeId === t.id ? 'primary.main' : 'divider',
                         transition: 'transform 120ms ease',
                         '&:hover': { transform: 'translateY(-2px)' },
+                        overflow: 'hidden',
                       }}
                     >
                       <CardActionArea onClick={() => setEventTypeId(t.id)}>
+                        {t.imageUrl ? (
+                          <CardMedia
+                            component="img"
+                            height={140}
+                            image={t.imageUrl}
+                            alt=""
+                            sx={{ objectFit: 'cover' }}
+                          />
+                        ) : null}
                         <CardContent>
-                          <Typography variant="h6">{t.name}</Typography>
+                          <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
+                            {t.name.replace(/_/g, ' ')}
+                          </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {t.description}
                           </Typography>
@@ -118,7 +184,8 @@ export function LandingPage() {
                 Quick details
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Selected: <strong>{selectedEventType?.name}</strong>
+                Selected:{' '}
+                <strong>{selectedEventType?.name.replace(/_/g, ' ')}</strong>
               </Typography>
 
               <TextField label="Event title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
@@ -178,4 +245,3 @@ export function LandingPage() {
     </Container>
   );
 }
-
