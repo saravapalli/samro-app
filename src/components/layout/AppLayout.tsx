@@ -6,6 +6,7 @@ import HomeRounded from '@mui/icons-material/HomeRounded';
 import EventRounded from '@mui/icons-material/EventRounded';
 import AssignmentTurnedInRounded from '@mui/icons-material/AssignmentTurnedInRounded';
 import LocalPhoneRounded from '@mui/icons-material/LocalPhoneRounded';
+import { SuggestionPanel } from '../agent/SuggestionPanel';
 import { usePlanning } from '../../context/PlanningContext';
 
 const drawerWidth = 270;
@@ -143,6 +144,7 @@ export function AppLayout() {
 
         <Box component="main" sx={{ flexGrow: 1, p: 3, minWidth: 0 }}>
           <Toolbar />
+          <SuggestionPanel />
           <Outlet />
         </Box>
       </Box>

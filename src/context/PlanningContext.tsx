@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { fetchEventPlanningContext, getApiBase } from '../api/client';
 import {
   EVENT_TYPES,
   mockAutoGenerateRequirements,
@@ -8,6 +9,7 @@ import {
   mockGenerateMatches,
   mockShortlistMatch,
 } from '../api/mockApi';
+import type { ServerEventContext } from '../api/suggestionEngine';
 
 export type EventTypeOption = { id: number; name: string; description?: string };
 
@@ -93,6 +95,10 @@ type PlanningContextValue = {
   setRequirementDiyOrHire: (requirementId: number, mode: 'hire' | 'diy') => void;
   setRequirementBudgetOverride: (requirementId: number, budget: number | undefined) => void;
   contactShortlisted: (input: { requirementId: number; message: string }[]) => Promise<void>;
+
+  /** When VITE_API_BASE is set, last snapshot from GET /events/{id}/context */
+  serverEventContext: ServerEventContext | null;
+  refreshServerEventContext: () => Promise<void>;
 };
 
 const PlanningContext = createContext<PlanningContextValue | null>(null);
@@ -108,6 +114,20 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
     Record<number, BusinessMatch | undefined>
   >({});
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [serverEventContext, setServerEventContext] = useState<ServerEventContext | null>(null);
+
+  const refreshServerEventContext = useCallback(async () => {
+    if (!getApiBase() || !event?.id) {
+      setServerEventContext(null);
+      return;
+    }
+    const ctx = await fetchEventPlanningContext(event.id);
+    setServerEventContext(ctx);
+  }, [event?.id]);
+
+  useEffect(() => {
+    void refreshServerEventContext();
+  }, [refreshServerEventContext]);
 
   const createDraftEvent = useCallback(async (input: {
     eventTypeId: number;
@@ -165,29 +185,44 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
   }, [requirements]);
 
   const shortlistMatch = useCallback(async (matchId: number) => {
-    await mockShortlistMatch({ matchId });
+    let reqId: number | null = null;
+    let picked: BusinessMatch | undefined;
+    for (const [k, list] of Object.entries(matchesByRequirementId)) {
+      const m = list.find((x) => x.id === matchId);
+      if (m) {
+        reqId = Number(k);
+        picked = m;
+        break;
+      }
+    }
+    if (reqId == null || !picked) return;
+
+    const snapshotMatches = matchesByRequirementId;
+    const snapshotShort = shortlistedMatchByRequirementId;
 
     setMatchesByRequirementId((prev) => {
-      // Update status inside the list for the requirement.
-      const next = { ...prev };
-      for (const [reqIdStr, list] of Object.entries(next)) {
-        const reqId = Number(reqIdStr);
-        const idx = list.findIndex((m) => m.id === matchId);
-        if (idx >= 0) {
-          next[reqId] = list.map((m) => ({
-            ...m,
-            status: m.id === matchId ? 'shortlisted' : m.status === 'shortlisted' ? 'suggested' : m.status,
-          }));
-          setShortlistedMatchByRequirementId((prevShort) => ({
-            ...prevShort,
-            [reqId]: next[reqId].find((m) => m.id === matchId),
-          }));
-          break;
-        }
-      }
-      return next;
+      const list = prev[reqId!] ?? [];
+      return {
+        ...prev,
+        [reqId!]: list.map((m) => ({
+          ...m,
+          status: m.id === matchId ? 'shortlisted' : m.status === 'shortlisted' ? 'suggested' : m.status,
+        })),
+      };
     });
-  }, []);
+    setShortlistedMatchByRequirementId((prev) => ({
+      ...prev,
+      [reqId!]: { ...picked!, status: 'shortlisted' },
+    }));
+
+    try {
+      await mockShortlistMatch({ matchId });
+    } catch (e) {
+      setMatchesByRequirementId(snapshotMatches);
+      setShortlistedMatchByRequirementId(snapshotShort);
+      throw e;
+    }
+  }, [matchesByRequirementId, shortlistedMatchByRequirementId]);
 
   const removeShortlist = useCallback((requirementId: number) => {
     setShortlistedMatchByRequirementId((prev) => ({ ...prev, [requirementId]: undefined }));
@@ -258,6 +293,8 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
       setRequirementDiyOrHire,
       setRequirementBudgetOverride,
       contactShortlisted,
+      serverEventContext,
+      refreshServerEventContext,
     }),
     [
       autoGenerateRequirements,
@@ -269,6 +306,8 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
       matchesByRequirementId,
       removeShortlist,
       requirements,
+      refreshServerEventContext,
+      serverEventContext,
       setRequirementDiyOrHire,
       setRequirementBudgetOverride,
       shortlistedMatchByRequirementId,

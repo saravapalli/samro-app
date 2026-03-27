@@ -53,6 +53,7 @@ export function RequirementSetupPage() {
   }
 
   async function onSeeMatches() {
+    if (!requirement) return;
     setLoading(true);
     setRequirementBudgetOverride(requirement.id, budgetOverride === '' ? undefined : Number(budgetOverride));
     setRequirementDiyOrHire(requirement.id, mode);
